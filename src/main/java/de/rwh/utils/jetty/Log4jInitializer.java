@@ -1,0 +1,33 @@
+package de.rwh.utils.jetty;
+
+import java.util.Properties;
+
+import org.apache.log4j.xml.DOMConfigurator;
+
+public final class Log4jInitializer
+{
+	public static final String PROPERTY_JETTY_LOG4J_CONFIG = "jetty.log4j.config";
+	public static final String PROPERTY_JETTY_LOG4J_WATCH = "jetty.log4j.watch";
+	public static final String PROPERTY_JETTY_LOG4J_WATCH_DEFAULT = "false";
+
+	private Log4jInitializer()
+	{
+	}
+
+	public static void initializeLog4j(Properties properties)
+	{
+		String configLocation = properties.getProperty(PROPERTY_JETTY_LOG4J_CONFIG);
+		boolean watchConfig = Boolean
+				.parseBoolean(properties.getProperty(PROPERTY_JETTY_LOG4J_WATCH, PROPERTY_JETTY_LOG4J_WATCH_DEFAULT));
+
+		initializeLog4j(configLocation, watchConfig);
+	}
+
+	public static void initializeLog4j(String configLocation, boolean watchConfig)
+	{
+		if (watchConfig)
+			DOMConfigurator.configureAndWatch(configLocation);
+		else
+			DOMConfigurator.configure(configLocation);
+	}
+}
