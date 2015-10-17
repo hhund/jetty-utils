@@ -1,6 +1,8 @@
 package de.rwh.utils.jetty;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -187,7 +189,7 @@ public class JettyServer extends Server
 
 		ClassLoader cl = JettyServer.class.getClassLoader();
 		URL[] urls = ((URLClassLoader) cl).getURLs();
-		entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(s -> s.replace("file:/", ""))
+		entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(JettyServer::pathStringFromURI)
 				.collect(Collectors.toList()));
 
 		logger.debug("ClassLoader entries: {}",
@@ -204,11 +206,24 @@ public class JettyServer extends Server
 				List<String> manifestEntries = Arrays.asList(manifestClassPath.split(" "));
 
 				logger.debug("Manifest entries: {}", manifestEntries);
-				entries.addAll(manifestEntries.stream().map(s -> s.replace("file:/", "")).collect(Collectors.toList()));
+				entries.addAll(
+						manifestEntries.stream().map(JettyServer::pathStringFromURI).collect(Collectors.toList()));
 			}
 		}
 
 		return entries.stream();
+	}
+
+	public static String pathStringFromURI(String uri)
+	{
+		try
+		{
+			return Paths.get(new URI(uri)).toString();
+		}
+		catch (URISyntaxException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static Manifest readManifest()
