@@ -190,6 +190,9 @@ public class JettyServer extends Server
 		entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(s -> s.replace("file:/", ""))
 				.collect(Collectors.toList()));
 
+		logger.debug("ClassLoader entries: {}",
+				Arrays.stream(urls).map(u -> u.toExternalForm()).collect(Collectors.toList()));
+
 		if (Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME) != null)
 		{
 			Manifest manifest = readManifest();
@@ -199,6 +202,8 @@ public class JettyServer extends Server
 			if (manifestClassPath != null)
 			{
 				List<String> manifestEntries = Arrays.asList(manifestClassPath.split(" "));
+
+				logger.debug("Manifest entries: {}", manifestEntries);
 				entries.addAll(manifestEntries.stream().map(s -> s.replace("file:/", "")).collect(Collectors.toList()));
 			}
 		}
