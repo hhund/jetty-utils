@@ -1,5 +1,7 @@
 package de.rwh.utils.jetty;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.log4j.xml.DOMConfigurator;
@@ -25,6 +27,9 @@ public final class Log4jInitializer
 
 	public static void initializeLog4j(String configLocation, boolean watchConfig)
 	{
+		if (!Files.isReadable(Paths.get(configLocation)))
+			throw new IllegalArgumentException("Log4j config file '" + configLocation + "' not readable");
+
 		if (watchConfig)
 			DOMConfigurator.configureAndWatch(configLocation);
 		else
