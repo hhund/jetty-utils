@@ -214,11 +214,12 @@ public class JettyServer extends Server
 		return entries.stream();
 	}
 
-	public static String pathStringFromURI(String uri)
+	public static String pathStringFromURI(String uriString)
 	{
 		try
 		{
-			return Paths.get(new URI(uri)).toString();
+			URI uri = new URI(uriString);
+			return uri.getScheme() == null ? Paths.get(uriString).toString() : Paths.get(uri).toString();
 		}
 		catch (URISyntaxException e)
 		{
