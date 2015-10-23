@@ -13,6 +13,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -263,6 +264,15 @@ public class JettyServer extends Server
 			List<Class<?>> initializers, Properties initParameter, Stream<String> webInfClassesDirs,
 			Stream<String> webInfJars, Class<? extends Filter>... additionalFilters)
 	{
+		this(Collections.singletonList(connector), errorHandler, contextPath, initializers, initParameter,
+				webInfClassesDirs, webInfJars, additionalFilters);
+	}
+
+	@SafeVarargs
+	public JettyServer(List<Function<Server, ServerConnector>> connectors, ErrorHandler errorHandler,
+			String contextPath, List<Class<?>> initializers, Properties initParameter, Stream<String> webInfClassesDirs,
+			Stream<String> webInfJars, Class<? extends Filter>... additionalFilters)
+	{
 		WebAppContext context = new WebAppContext();
 
 		initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
@@ -289,7 +299,7 @@ public class JettyServer extends Server
 			context.addFilter(f, "/*", EnumSet.allOf(DispatcherType.class));
 		}
 
-		addConnector(connector.apply(this));
+		connectors.forEach(c -> addConnector(c.apply(this)));
 
 		setHandler(context);
 		setStopAtShutdown(true);
