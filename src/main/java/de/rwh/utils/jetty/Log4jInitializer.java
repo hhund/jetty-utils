@@ -19,6 +19,7 @@ public final class Log4jInitializer
 	public static void initializeLog4j(Properties properties)
 	{
 		String configLocation = properties.getProperty(PROPERTY_JETTY_LOG4J_CONFIG);
+
 		boolean watchConfig = Boolean
 				.parseBoolean(properties.getProperty(PROPERTY_JETTY_LOG4J_WATCH, PROPERTY_JETTY_LOG4J_WATCH_DEFAULT));
 
@@ -27,6 +28,9 @@ public final class Log4jInitializer
 
 	public static void initializeLog4j(String configLocation, boolean watchConfig)
 	{
+		if (configLocation == null || configLocation.isEmpty())
+			throw new IllegalArgumentException("Property '" + PROPERTY_JETTY_LOG4J_CONFIG + "' not found or empty");
+
 		if (!Files.isReadable(Paths.get(configLocation)))
 			throw new IllegalArgumentException("Log4j config file '" + configLocation + "' not readable");
 
