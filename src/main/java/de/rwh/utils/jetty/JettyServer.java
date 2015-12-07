@@ -50,6 +50,7 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwh.utils.crypto.CertificateHelper;
 import de.rwh.utils.crypto.io.CertificateReader;
 
 public class JettyServer extends Server
@@ -97,12 +98,32 @@ public class JettyServer extends Server
 		}
 	}
 
+	private static void logCertificateConfig(int httpsPort, KeyStore trustStore, KeyStore keyStore)
+	{
+		if (!logger.isDebugEnabled())
+			return;
+
+		try
+		{
+			logger.info("Using TrustStore for https connector {} with: {}", httpsPort,
+					CertificateHelper.listCertificateSubjectNames(trustStore));
+			logger.info("Using KeyStore for https connector {} with: {}", httpsPort,
+					CertificateHelper.listCertificateSubjectNames(keyStore));
+		}
+		catch (KeyStoreException e)
+		{
+			logger.warn("Error while printing TrustStore/KeyStore config", e);
+		}
+	}
+
 	public static Function<Server, ServerConnector> httpsConnector(HttpConfiguration httpConfiguration,
 			String httpsHost, int httpsPort, KeyStore trustStore, KeyStore keyStore, String keyStorePassword,
 			boolean needClientAuth)
 	{
 		return server ->
 		{
+			logCertificateConfig(httpsPort, trustStore, keyStore);
+
 			SslContextFactory sslContextFactory = new SslContextFactory();
 			sslContextFactory.setTrustStore(trustStore);
 			sslContextFactory.setKeyStore(keyStore);
