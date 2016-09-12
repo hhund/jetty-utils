@@ -279,6 +279,7 @@ public class JettyServer extends Server
 	}
 
 	private final Context servletContext;
+	private final WebAppContext webAppContext;
 
 	@SafeVarargs
 	public JettyServer(Function<Server, ServerConnector> connector, ErrorHandler errorHandler, String contextPath,
@@ -295,8 +296,10 @@ public class JettyServer extends Server
 			Stream<String> webInfJars, Class<? extends Filter>... additionalFilters)
 	{
 		WebAppContext context = new WebAppContext();
-
+		context.setThrowUnavailableOnStartupException(true);
+		
 		initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
+		logger.debug("InitParams: {}", context.getInitParams());
 
 		context.setContextPath(contextPath);
 		context.setAttribute(AnnotationConfiguration.SERVLET_CONTAINER_INITIALIZER_ORDER,
@@ -329,11 +332,17 @@ public class JettyServer extends Server
 		context.setErrorHandler(errorHandler);
 
 		servletContext = context.getServletContext();
+		webAppContext = context;
 	}
 
 	public Context getServletContext()
 	{
 		return servletContext;
+	}
+
+	public WebAppContext getWebAppContext()
+	{
+		return webAppContext;
 	}
 
 	public static void start(JettyServer server)
