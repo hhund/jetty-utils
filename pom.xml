@@ -26,7 +26,7 @@
 				<enabled>true</enabled>
 			</releases>
 			<id>repo-mi</id>
-			<url>https://repository.it.hs-heilbronn.de/repo-mi</url>
+			<url>https://repository.it.hs-heilbronn.de/artifactory/repo</url>
 		</repository>
 		<repository>
 			<id>central</id>
@@ -48,7 +48,7 @@
 				<enabled>true</enabled>
 			</releases>
 			<id>repo-mi</id>
-			<url>https://repository.it.hs-heilbronn.de/repo-mi</url>
+			<url>https://repository.it.hs-heilbronn.de/artifactory/repo</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>central</id>
@@ -66,14 +66,14 @@
 		<snapshotRepository>
 			<id>repo-it-snapshot</id>
 			<name>libs-snapshot-mi</name>
-			<url>https://repository.it.hs-heilbronn.de/libs-snapshot-mi-local</url>
+			<url>https://repository.it.hs-heilbronn.de/artifactory/libs-snapshot-mi-local</url>
 
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<repository>
 			<id>repo-it-release</id>
 			<name>libs-release-mi</name>
-			<url>https://repository.it.hs-heilbronn.de/libs-release-mi-local</url>
+			<url>https://repository.it.hs-heilbronn.de/artifactory/libs-release-mi-local</url>
 		</repository>
 
 		<site>
