@@ -297,7 +297,7 @@ public class JettyServer extends Server
 	{
 		WebAppContext context = new WebAppContext();
 		context.setThrowUnavailableOnStartupException(true);
-		
+
 		initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
 		logger.debug("InitParams: {}", context.getInitParams());
 
@@ -308,8 +308,13 @@ public class JettyServer extends Server
 
 		context.setAttribute(WebInfConfiguration.WEBINF_JAR_PATTERN, "");
 
-		webInfJars.map(e -> Paths.get(e)).filter(Files::isReadable).map(PathResource::new)
-				.forEach(r -> context.getMetaData().addWebInfJar(r));
+		webInfJars.map(e -> Paths.get(e)).filter(p ->
+		{
+			boolean readable = Files.isReadable(p);
+			if (!readable)
+				logger.warn("Classpath entry '{}' not readable", p);
+			return readable;
+		}).map(PathResource::new).forEach(r -> context.getMetaData().addWebInfJar(r));
 
 		context.getMetaData().setWebInfClassesDirs(webInfClassesDirs.map(e -> Paths.get(e)).filter(Files::isReadable)
 				.map(PathResource::new).collect(Collectors.toList()));

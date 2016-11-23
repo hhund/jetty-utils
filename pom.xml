@@ -14,7 +14,7 @@
 
 		<slf4j.version>1.7.13</slf4j.version>
 
-		<jetty.version>9.3.8.v20160314</jetty.version>
+		<jetty.version>9.3.13.v20161014</jetty.version>
 	</properties>
 
 	<repositories>
