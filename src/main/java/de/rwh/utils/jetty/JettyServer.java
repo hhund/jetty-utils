@@ -3,8 +3,6 @@ package de.rwh.utils.jetty;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,9 +103,9 @@ public class JettyServer extends Server
 
 		try
 		{
-			logger.info("Using TrustStore for https connector {} with: {}", httpsPort,
+			logger.debug("Using TrustStore for https connector {} with: {}", httpsPort,
 					CertificateHelper.listCertificateSubjectNames(trustStore));
-			logger.info("Using KeyStore for https connector {} with: {}", httpsPort,
+			logger.debug("Using KeyStore for https connector {} with: {}", httpsPort,
 					CertificateHelper.listCertificateSubjectNames(keyStore));
 		}
 		catch (KeyStoreException e)
@@ -209,13 +207,13 @@ public class JettyServer extends Server
 	{
 		Set<String> entries = new HashSet<>();
 
-		ClassLoader cl = JettyServer.class.getClassLoader();
-		URL[] urls = ((URLClassLoader) cl).getURLs();
-		entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(JettyServer::pathStringFromURI)
-				.collect(Collectors.toList()));
-
-		logger.debug("ClassLoader entries: {}",
-				Arrays.stream(urls).map(u -> u.toExternalForm()).collect(Collectors.toList()));
+		// ClassLoader cl = JettyServer.class.getClassLoader();
+		// URL[] urls = ((URLClassLoader) cl).getURLs();
+		// entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(JettyServer::pathStringFromURI)
+		// .collect(Collectors.toList()));
+		//
+		// logger.debug("ClassLoader entries: {}",
+		// Arrays.stream(urls).map(u -> u.toExternalForm()).collect(Collectors.toList()));
 
 		if (Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME) != null)
 		{
