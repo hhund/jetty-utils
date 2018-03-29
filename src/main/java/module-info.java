@@ -3,7 +3,6 @@ module de.rwh.utils.jetty
 	exports de.rwh.utils.jetty;
 	
 	requires org.slf4j;
-	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
 	
 	requires de.rwh.utils.crypto;
