@@ -1,5 +1,6 @@
 package de.rwh.utils.jetty;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +31,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.annotations.AnnotationParser;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConfiguration.Customizer;
@@ -45,6 +47,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
+import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,6 +220,7 @@ public class JettyServer extends Server
 
 		if (Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME) != null)
 		{
+			logger.info("Processing Manifest file");
 			Manifest manifest = readManifest();
 			Attributes mainAttributes = manifest.getMainAttributes();
 			String manifestClassPath = mainAttributes.getValue(Attributes.Name.CLASS_PATH);
@@ -229,7 +233,13 @@ public class JettyServer extends Server
 				entries.addAll(
 						manifestEntries.stream().map(JettyServer::pathStringFromURI).collect(Collectors.toList()));
 			}
+			else
+				logger.warn("Class-Path entry in Manifest file not found");
 		}
+		else
+			logger.warn("Manifest file not found");
+
+		entries.addAll(Arrays.asList(System.getProperty("java.class.path").split(File.pathSeparator)));
 
 		return entries.stream();
 	}
@@ -294,6 +304,7 @@ public class JettyServer extends Server
 			Stream<String> webInfJars, Class<? extends Filter>... additionalFilters)
 	{
 		WebAppContext context = new WebAppContext();
+		context.setLogUrlOnStart(true);
 		context.setThrowUnavailableOnStartupException(true);
 
 		initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
@@ -301,9 +312,15 @@ public class JettyServer extends Server
 
 		context.setContextPath(contextPath);
 		context.setAttribute(AnnotationConfiguration.SERVLET_CONTAINER_INITIALIZER_ORDER,
-				initializers.stream().map(c -> c.getName()).collect(Collectors.joining(", ")));
-		context.setConfigurations(new Configuration[] { new AnnotationConfiguration() });
-
+				initializers.stream().map(c -> c.getName()).collect(Collectors.joining(", ")) + ", *");
+		context.setConfigurations(new Configuration[] { new AnnotationConfiguration()
+		{
+			@Override
+			protected org.eclipse.jetty.annotations.AnnotationParser createAnnotationParser(int javaPlatform)
+			{
+				return new AnnotationParser(javaPlatform, Opcodes.ASM7);
+			}
+		} });
 		context.setAttribute(WebInfConfiguration.WEBINF_JAR_PATTERN, "");
 
 		webInfJars.map(e -> Paths.get(e)).filter(p ->
@@ -319,7 +336,7 @@ public class JettyServer extends Server
 
 		logger.info("Web inf classes: dirs {}", context.getMetaData().getWebInfClassesDirs());
 		logger.info("Web inf classes: jars {}", context.getMetaData().getWebInfJars());
-
+		//
 		for (Class<? extends Filter> f : additionalFilters)
 		{
 			logger.info("Adding filter: {}", f.getName());
