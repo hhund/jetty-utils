@@ -10,15 +10,19 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.jar.Attributes;
@@ -51,6 +55,8 @@ import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwh.utils.auth.certificate.CertificateChecker;
+import de.rwh.utils.auth.certificate.CertificateCheckerImpl;
 import de.rwh.utils.crypto.CertificateHelper;
 import de.rwh.utils.crypto.io.CertificateReader;
 
@@ -89,6 +95,8 @@ public class JettyServer extends Server
 			KeyStore trustStore = CertificateReader.allFromCer(trustStorePath);
 			KeyStore keyStore = CertificateReader.fromPkcs12(keyStorePath, keyStorePassword);
 
+			checkServerCert(trustStore, keyStore);
+
 			return httpsConnector(httpConfiguration, httpsHost, httpsPort, trustStore, keyStore, keyStorePassword,
 					needClientAuth);
 		}
@@ -96,6 +104,20 @@ public class JettyServer extends Server
 				| IOException e)
 		{
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static void checkServerCert(KeyStore trustStore, KeyStore keyStore) throws KeyStoreException
+	{
+		CertificateChecker cc = new CertificateCheckerImpl(
+				Executors.newScheduledThreadPool(1, r -> new Thread(r, "LoggerScheduledExecutorServiceJetty")));
+
+		for (Enumeration<String> aliases = keyStore.aliases(); aliases.hasMoreElements();)
+		{
+			String alias = aliases.nextElement();
+			Certificate certificate = keyStore.getCertificate(alias);
+			if (certificate instanceof X509Certificate)
+				cc.checkServerCertificateAndScheduleWarning(trustStore, (X509Certificate) certificate);
 		}
 	}
 
