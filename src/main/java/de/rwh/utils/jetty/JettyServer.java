@@ -35,7 +35,6 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.annotations.AnnotationParser;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConfiguration.Customizer;
@@ -51,7 +50,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
-import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -335,14 +333,7 @@ public class JettyServer extends Server
 		context.setContextPath(contextPath);
 		context.setAttribute(AnnotationConfiguration.SERVLET_CONTAINER_INITIALIZER_ORDER,
 				initializers.stream().map(c -> c.getName()).collect(Collectors.joining(", ")) + ", *");
-		context.setConfigurations(new Configuration[] { new AnnotationConfiguration()
-		{
-			@Override
-			protected org.eclipse.jetty.annotations.AnnotationParser createAnnotationParser(int javaPlatform)
-			{
-				return new AnnotationParser(javaPlatform, Opcodes.ASM7);
-			}
-		} });
+		context.setConfigurations(new Configuration[] { new AnnotationConfiguration() });
 		context.setAttribute(WebInfConfiguration.WEBINF_JAR_PATTERN, "");
 
 		webInfJars.map(e -> Paths.get(e)).filter(p ->

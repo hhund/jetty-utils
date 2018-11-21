@@ -13,7 +13,7 @@
 	</parent>
 
 	<properties>
-		<jetty.version>9.4.12.v20180830</jetty.version>
+		<jetty.version>9.4.14.v20181114</jetty.version>
 	</properties>
 
 	<repositories>
@@ -72,16 +72,6 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-annotations</artifactId>
 			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>7.0-beta</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm-commons</artifactId>
-			<version>7.0-beta</version>
 		</dependency>
 
 		<!-- Crypto Utils -->
