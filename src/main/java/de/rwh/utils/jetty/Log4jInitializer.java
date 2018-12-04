@@ -13,7 +13,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 public final class Log4jInitializer
 {
 	public static final String PROPERTY_JETTY_LOG4J_CONFIG = "jetty.log4j.config";
-	public static final String PROPERTY_JETTY_LOG4J_WATCH = "jetty.log4j.watch";
 
 	private Log4jInitializer()
 	{
