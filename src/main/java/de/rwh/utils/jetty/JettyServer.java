@@ -48,8 +48,8 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwh.utils.auth.certificate.CertificateChecker;
-import de.rwh.utils.auth.certificate.CertificateCheckerImpl;
+import de.rwh.utils.crypto.CertificateChecker;
+import de.rwh.utils.crypto.CertificateCheckerImpl;
 import de.rwh.utils.crypto.CertificateHelper;
 import de.rwh.utils.crypto.io.CertificateReader;
 

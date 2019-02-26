@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.rwh.utils</groupId>
 	<artifactId>jetty-utils</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.3.0-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.rwh.pom</groupId>
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>de.rwh.utils</groupId>
 			<artifactId>log4j2-utils</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Jetty -->
@@ -74,12 +74,7 @@
 		<dependency>
 			<groupId>de.rwh.utils</groupId>
 			<artifactId>crypto-utils</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>de.rwh.utils</groupId>
-			<artifactId>authentication-utils</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
+			<version>2.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
