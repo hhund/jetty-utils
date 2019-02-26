@@ -17,17 +17,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -228,40 +223,7 @@ public class JettyServer extends Server
 
 	public static Stream<String> classPathEntries()
 	{
-		Set<String> entries = new HashSet<>();
-
-		// ClassLoader cl = JettyServer.class.getClassLoader();
-		// URL[] urls = ((URLClassLoader) cl).getURLs();
-		// entries.addAll(Arrays.stream(urls).map(u -> u.toExternalForm()).map(JettyServer::pathStringFromURI)
-		// .collect(Collectors.toList()));
-		//
-		// logger.debug("ClassLoader entries: {}",
-		// Arrays.stream(urls).map(u -> u.toExternalForm()).collect(Collectors.toList()));
-
-		if (Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME) != null)
-		{
-			logger.info("Processing Manifest file");
-			Manifest manifest = readManifest();
-			Attributes mainAttributes = manifest.getMainAttributes();
-			String manifestClassPath = mainAttributes.getValue(Attributes.Name.CLASS_PATH);
-
-			if (manifestClassPath != null)
-			{
-				List<String> manifestEntries = Arrays.asList(manifestClassPath.split(" "));
-
-				logger.debug("Manifest entries: {}", manifestEntries);
-				entries.addAll(
-						manifestEntries.stream().map(JettyServer::pathStringFromURI).collect(Collectors.toList()));
-			}
-			else
-				logger.warn("Class-Path entry in Manifest file not found");
-		}
-		else
-			logger.warn("Manifest file not found");
-
-		entries.addAll(Arrays.asList(System.getProperty("java.class.path").split(File.pathSeparator)));
-
-		return entries.stream();
+		return Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator));
 	}
 
 	public static String pathStringFromURI(String uriString)
@@ -272,19 +234,6 @@ public class JettyServer extends Server
 			return uri.getScheme() == null ? Paths.get(uriString).toString() : Paths.get(uri).toString();
 		}
 		catch (URISyntaxException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static Manifest readManifest()
-	{
-		try
-		{
-			return new Manifest(
-					Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME));
-		}
-		catch (IOException e)
 		{
 			throw new RuntimeException(e);
 		}
