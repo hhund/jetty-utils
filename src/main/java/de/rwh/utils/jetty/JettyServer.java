@@ -140,7 +140,7 @@ public class JettyServer extends Server
 		{
 			logCertificateConfig(httpsPort, trustStore, keyStore);
 
-			SslContextFactory sslContextFactory = new SslContextFactory();
+			SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 			sslContextFactory.setTrustStore(trustStore);
 			sslContextFactory.setKeyStore(keyStore);
 			sslContextFactory.setKeyStorePassword(keyStorePassword);
