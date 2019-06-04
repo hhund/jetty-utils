@@ -11,6 +11,10 @@
 		<version>0.7.0</version>
 	</parent>
 
+	<name>jetty-utils</name>
+	<description>Utility library for running an embedded Jetty with service provider based initialization of Spring, Jersey et cetera.</description>
+	<url>https://github.com/hhund/jetty-utils</url>
+
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -52,7 +56,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/hhund/jetty-utils.git</connection>
-		<developerConnection>scm:git:git@github.com/hhund/jetty-utils.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:hhund/jetty-utils.git</developerConnection>
 		<url>http://github.com/hhund/jetty-utils</url>
 	</scm>
 
