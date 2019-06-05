@@ -57,7 +57,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/hhund/jetty-utils.git</connection>
 		<developerConnection>scm:git:git@github.com:hhund/jetty-utils.git</developerConnection>
-		<url>http://github.com/hhund/jetty-utils</url>
+		<url>https://github.com/hhund/jetty-utils</url>
 	</scm>
 
 	<dependencies>
@@ -123,6 +123,19 @@
 						<id>attach-javadocs</id>
 						<goals>
 							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
 						</goals>
 					</execution>
 				</executions>
