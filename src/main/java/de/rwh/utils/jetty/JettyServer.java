@@ -81,7 +81,7 @@ public class JettyServer extends Server
 			Path trustStorePath = Paths.get(properties.getProperty(PROPERTY_JETTY_TRUSTSTORE_PEM));
 			Path keyStorePath = Paths.get(properties.getProperty(PROPERTY_JETTY_KEYSTORE_P12));
 
-			String keyStorePassword = properties.getProperty(PROPERTY_JETTY_KEYSTORE_PASSWORD);
+			char[] keyStorePassword = toCharArray(properties.getProperty(PROPERTY_JETTY_KEYSTORE_PASSWORD));
 			boolean needClientAuth = Boolean.parseBoolean(
 					properties.getProperty(PROPERTY_JETTY_NEEDCLIENTAUTH, PROPERTY_JETTY_NEEDCLIENTAUTH_DEFAULT));
 
@@ -98,6 +98,11 @@ public class JettyServer extends Server
 		{
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static char[] toCharArray(String password)
+	{
+		return password == null ? null : password.toCharArray();
 	}
 
 	private static void checkServerCert(KeyStore trustStore, KeyStore keyStore) throws KeyStoreException
@@ -133,7 +138,7 @@ public class JettyServer extends Server
 	}
 
 	public static Function<Server, ServerConnector> httpsConnector(HttpConfiguration httpConfiguration,
-			String httpsHost, int httpsPort, KeyStore trustStore, KeyStore keyStore, String keyStorePassword,
+			String httpsHost, int httpsPort, KeyStore trustStore, KeyStore keyStore, char[] keyStorePassword,
 			boolean needClientAuth)
 	{
 		return server ->
@@ -143,7 +148,7 @@ public class JettyServer extends Server
 			SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 			sslContextFactory.setTrustStore(trustStore);
 			sslContextFactory.setKeyStore(keyStore);
-			sslContextFactory.setKeyStorePassword(keyStorePassword);
+			sslContextFactory.setKeyStorePassword(String.valueOf(keyStorePassword));
 			sslContextFactory.setNeedClientAuth(needClientAuth);
 
 			SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory,
