@@ -12,7 +12,7 @@
 	</parent>
 
 	<name>jetty-utils</name>
-	<description>Utility library for running an embedded Jetty with service provider based initialization of Spring, Jersey et cetera</description>
+	<description>Utility library for running an embedded Jetty with service provider based initialization of Spring and Jersey</description>
 	<url>https://github.com/hhund/jetty-utils</url>
 
 	<licenses>
