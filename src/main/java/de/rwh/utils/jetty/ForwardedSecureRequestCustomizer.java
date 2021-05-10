@@ -1,6 +1,8 @@
 package de.rwh.utils.jetty;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -17,6 +19,9 @@ public class ForwardedSecureRequestCustomizer implements Customizer
 {
 	public static final String X_CLIENT_CERT_HEADER = "X-ClientCert";
 
+	private static final String URL_ENCODED_CERT_BEGIN = "-----BEGIN%20CERTIFICATE-----%0A";
+	private static final String URL_ENCODED_CERT_END = "%0A-----END%20CERTIFICATE-----%0A";
+
 	private static final String CERT_BEGIN = "-----BEGIN CERTIFICATE-----";
 	private static final String CERT_END = "-----END CERTIFICATE-----";
 
@@ -26,7 +31,7 @@ public class ForwardedSecureRequestCustomizer implements Customizer
 	public void customize(Connector connector, HttpConfiguration channelConfig, Request request)
 	{
 		X509Certificate clientCert = getClientCert(request);
-		
+
 		if (clientCert != null)
 			request.setAttribute("javax.servlet.request.X509Certificate", new X509Certificate[] { clientCert });
 	}
@@ -45,23 +50,32 @@ public class ForwardedSecureRequestCustomizer implements Customizer
 			logger.warn("{} header empty", X_CLIENT_CERT_HEADER);
 			return null;
 		}
-		if (!clientCertString.startsWith(CERT_BEGIN))
+
+		if (!clientCertString.startsWith(CERT_BEGIN) && !clientCertString.startsWith(URL_ENCODED_CERT_BEGIN))
 		{
-			logger.warn("{} header does not start with {}", X_CLIENT_CERT_HEADER, CERT_BEGIN);
+			logger.warn("{} header does not start with {} or {}", X_CLIENT_CERT_HEADER, CERT_BEGIN,
+					URL_ENCODED_CERT_BEGIN);
 			return null;
 		}
-		if (!clientCertString.endsWith(CERT_END))
+		if (!clientCertString.endsWith(CERT_END) && !clientCertString.endsWith(URL_ENCODED_CERT_END))
 		{
-			logger.warn("{} header does not end with {}", X_CLIENT_CERT_HEADER, CERT_END);
+			logger.warn("{} header does not end with {} or {}", X_CLIENT_CERT_HEADER, CERT_END, URL_ENCODED_CERT_END);
 			return null;
 		}
 
-		String s = CERT_BEGIN + clientCertString.replace(CERT_BEGIN, "").replace(CERT_END, "").replaceAll(" ", "\n")
-				+ CERT_END;
+		if (clientCertString.startsWith(CERT_BEGIN))
+		{
+			clientCertString = CERT_BEGIN
+					+ clientCertString.replace(CERT_BEGIN, "").replace(CERT_END, "").replaceAll(" ", "\n") + CERT_END;
+		}
+		else
+		{
+			clientCertString = URLDecoder.decode(clientCertString, StandardCharsets.UTF_8).trim();
+		}
 
 		try
 		{
-			return PemIo.readX509CertificateFromPem(s);
+			return PemIo.readX509CertificateFromPem(clientCertString);
 		}
 		catch (CertificateException | IOException e)
 		{
