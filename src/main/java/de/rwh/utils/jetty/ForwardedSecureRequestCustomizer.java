@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -17,8 +18,6 @@ import de.rwh.utils.crypto.io.PemIo;
 
 public class ForwardedSecureRequestCustomizer implements Customizer
 {
-	public static final String X_CLIENT_CERT_HEADER = "X-ClientCert";
-
 	private static final String URL_ENCODED_CERT_BEGIN = "-----BEGIN%20CERTIFICATE-----%0A";
 	private static final String URL_ENCODED_CERT_END = "%0A-----END%20CERTIFICATE-----%0A";
 
@@ -26,6 +25,13 @@ public class ForwardedSecureRequestCustomizer implements Customizer
 	private static final String CERT_END = "-----END CERTIFICATE-----";
 
 	private static final Logger logger = LoggerFactory.getLogger(ForwardedSecureRequestCustomizer.class);
+
+	private final String clientCertHeaderName;
+
+	public ForwardedSecureRequestCustomizer(String clientCertHeaderName)
+	{
+		this.clientCertHeaderName = Objects.requireNonNull(clientCertHeaderName, "clientCertHeaderName");
+	}
 
 	@Override
 	public void customize(Connector connector, HttpConfiguration channelConfig, Request request)
@@ -38,28 +44,28 @@ public class ForwardedSecureRequestCustomizer implements Customizer
 
 	private X509Certificate getClientCert(Request request)
 	{
-		String clientCertString = request.getHeader(X_CLIENT_CERT_HEADER);
+		String clientCertString = request.getHeader(clientCertHeaderName);
 
 		if (clientCertString == null)
 		{
-			logger.warn("No {} header found", X_CLIENT_CERT_HEADER);
+			logger.warn("No {} header found", clientCertHeaderName);
 			return null;
 		}
 		if (clientCertString.isEmpty())
 		{
-			logger.warn("{} header empty", X_CLIENT_CERT_HEADER);
+			logger.warn("{} header empty", clientCertHeaderName);
 			return null;
 		}
 
 		if (!clientCertString.startsWith(CERT_BEGIN) && !clientCertString.startsWith(URL_ENCODED_CERT_BEGIN))
 		{
-			logger.warn("{} header does not start with {} or {}", X_CLIENT_CERT_HEADER, CERT_BEGIN,
+			logger.warn("{} header does not start with {} or {}", clientCertHeaderName, CERT_BEGIN,
 					URL_ENCODED_CERT_BEGIN);
 			return null;
 		}
 		if (!clientCertString.endsWith(CERT_END) && !clientCertString.endsWith(URL_ENCODED_CERT_END))
 		{
-			logger.warn("{} header does not end with {} or {}", X_CLIENT_CERT_HEADER, CERT_END, URL_ENCODED_CERT_END);
+			logger.warn("{} header does not end with {} or {}", clientCertHeaderName, CERT_END, URL_ENCODED_CERT_END);
 			return null;
 		}
 

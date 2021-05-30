@@ -66,6 +66,8 @@ public class JettyServer extends Server
 	private static final String PROPERTY_JETTY_KEYSTORE_PASSWORD = "jetty.keystore.password";
 	private static final String PROPERTY_JETTY_NEEDCLIENTAUTH = "jetty.needclientauth";
 	private static final String PROPERTY_JETTY_NEEDCLIENTAUTH_DEFAULT = "false";
+	private static final String PROPERTY_JETTY_CLIENT_CERT_HEADER = "jetty.clientcertheader";
+	private static final String PROPERTY_JETTY_CLIENT_CERT_HEADER_DEFAULT = "X-ClientCert";
 
 	private static final Logger logger = LoggerFactory.getLogger(JettyServer.class);
 
@@ -206,14 +208,15 @@ public class JettyServer extends Server
 		return configuration;
 	}
 
-	public static SecureRequestCustomizer secureRequestCustomizer()
+	public static SecureRequestCustomizer secureRequestCustomizer(Properties properties)
 	{
 		return new SecureRequestCustomizer();
 	}
 
-	public static ForwardedSecureRequestCustomizer forwardedSecureRequestCustomizer()
+	public static ForwardedSecureRequestCustomizer forwardedSecureRequestCustomizer(Properties properties)
 	{
-		return new ForwardedSecureRequestCustomizer();
+		String clientCertHeaderName = properties.getProperty(PROPERTY_JETTY_CLIENT_CERT_HEADER, PROPERTY_JETTY_CLIENT_CERT_HEADER_DEFAULT);
+		return new ForwardedSecureRequestCustomizer(clientCertHeaderName);
 	}
 
 	public static Stream<String> webInfJars(Predicate<String> filter)
