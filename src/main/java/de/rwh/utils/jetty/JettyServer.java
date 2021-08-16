@@ -215,7 +215,8 @@ public class JettyServer extends Server
 
 	public static ForwardedSecureRequestCustomizer forwardedSecureRequestCustomizer(Properties properties)
 	{
-		String clientCertHeaderName = properties.getProperty(PROPERTY_JETTY_CLIENT_CERT_HEADER, PROPERTY_JETTY_CLIENT_CERT_HEADER_DEFAULT);
+		String clientCertHeaderName = properties.getProperty(PROPERTY_JETTY_CLIENT_CERT_HEADER,
+				PROPERTY_JETTY_CLIENT_CERT_HEADER_DEFAULT);
 		return new ForwardedSecureRequestCustomizer(clientCertHeaderName);
 	}
 
@@ -284,8 +285,11 @@ public class JettyServer extends Server
 		context.setLogUrlOnStart(true);
 		context.setThrowUnavailableOnStartupException(true);
 
-		initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
-		logger.debug("InitParams: {}", context.getInitParams());
+		if (initParameter != null)
+		{
+			initParameter.forEach((k, v) -> context.setInitParameter(Objects.toString(k), Objects.toString(v)));
+			logger.debug("InitParams: {}", context.getInitParams());
+		}
 
 		context.setContextPath(contextPath);
 		context.setAttribute(AnnotationConfiguration.SERVLET_CONTAINER_INITIALIZER_ORDER,
@@ -306,7 +310,7 @@ public class JettyServer extends Server
 
 		logger.info("Web inf classes: dirs {}", context.getMetaData().getWebInfClassesDirs());
 		logger.info("Web inf classes: jars {}", context.getMetaData().getWebInfJars());
-		//
+
 		for (Class<? extends Filter> f : additionalFilters)
 		{
 			logger.info("Adding filter: {}", f.getName());
