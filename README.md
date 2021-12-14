@@ -8,6 +8,6 @@ Utility library for running an embedded Jetty with service provider based initia
 <dependency>
     <groupId>de.hs-heilbronn.mi</groupId>
     <artifactId>jetty-utils</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
 </dependency>
 ```
